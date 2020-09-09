@@ -57,7 +57,7 @@ hpx-1.2.1/build/install : hpx-1.2.1 cmake-3.14.4-Linux-x86_64 boost_1_70_0/stage
 	  make install )
 
 YewPar :
-	git clone https://github.com/BlairArchibald/YewPar.git
+	git clone https://github.com/zxcvsop/YewPar.git
 
 YewPar/build/install : hpx-1.2.1/build/install YewPar
 	( cd YewPar ; \
