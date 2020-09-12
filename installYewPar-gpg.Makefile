@@ -12,6 +12,7 @@ all : YewPar/YewPar_env.sh
 boost_1_70_0 :
 	wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
 	tar xzvf boost_1_70_0.tar.gz
+	rm -f boost_1_70_0.tar.gz
 
 boost_1_70_0/stage/lib : boost_1_70_0
 	( cd boost_1_70_0 ; \
@@ -21,10 +22,12 @@ boost_1_70_0/stage/lib : boost_1_70_0
 cmake-3.14.4-Linux-x86_64 :
 	wget https://github.com/Kitware/CMake/releases/download/v3.14.4/cmake-3.14.4-Linux-x86_64.tar.gz
 	tar xzvf cmake-3.14.4-Linux-x86_64.tar.gz
+	rm -f cmake-3.14.4-Linux-x86_64.tar.gz
 
 gperftools-gperftools-2.7 :
 	wget https://github.com/gperftools/gperftools/archive/gperftools-2.7.tar.gz
 	tar xzvf gperftools-2.7.tar.gz
+	rm -f gperftools-2.7.tar.gz
 
 gperftools-gperftools-2.7/install/lib : gperftools-gperftools-2.7
 	( cd gperftools-gperftools-2.7 ; \
@@ -38,6 +41,7 @@ hpx-1.2.1 :
 	wget https://github.com/STEllAR-GROUP/hpx/archive/1.2.1.tar.gz
 	mv 1.2.1.tar.gz hpx-1.2.1.tar.gz
 	tar xzvf hpx-1.2.1.tar.gz
+	rm -f hpx-1.2.1.tar.gz
 
 hpx-1.2.1/build/install : hpx-1.2.1 cmake-3.14.4-Linux-x86_64 boost_1_70_0/stage/lib gperftools-gperftools-2.7/install/lib
 	(cd hpx-1.2.1 ; \
@@ -57,7 +61,8 @@ hpx-1.2.1/build/install : hpx-1.2.1 cmake-3.14.4-Linux-x86_64 boost_1_70_0/stage
 	  make install )
 
 YewPar :
-	git clone https://github.com/zxcvsop/YewPar.git
+	git clone https://github.com/zxcvsop/YewPar_M.git
+	mv YewPar_M YewPar
 
 YewPar/build/install : hpx-1.2.1/build/install YewPar
 	( cd YewPar ; \
