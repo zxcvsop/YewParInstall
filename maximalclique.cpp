@@ -391,18 +391,20 @@ namespace
                 // filter p to contain vertices adjacent to v
                 BitSet<n_words_> new_p = p;
                 graph.intersect_with_row(v, new_p);
-				BitSet<n_words_> new_u = used;
-				graph.intersect_with_row(v,new_u);
-				if(new_p.empty()&&new_u.empty()){
-					result.count++;
-				}else{
-					expand(c,new_p,new_u);
-				}
+		
+		BitSet<n_words_> new_u = used;
+		graph.intersect_with_row(v,new_u);
+		    
+		if(new_p.empty()&&new_u.empty()){
+			result.count++;
+		}else{
+			expand(c,new_p,new_u);
+		}
 
                 // now consider not taking v
                 c.pop_back();
                 p.unset(v);
-				used.set(v);
+		used.set(v);
             }
         }
 
@@ -419,9 +421,8 @@ namespace
             p.set_all();
             used.resize(graph.size());
             used.set_all_zero();
-            std::vector<BitSet<n_words_>> sols;
 
-            expand(c, p,used,sols);
+            expand(c, p,used);
 
             return result;
         }
