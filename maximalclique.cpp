@@ -368,8 +368,7 @@ namespace
         auto expand(
                 std::vector<unsigned> & c,
                 BitSet<n_words_> & p,
-                BitSet<n_words_> & used,
-                std::vector<BitSet<n_words_>> &sols
+                BitSet<n_words_> & used
                 ) -> void
         {
 
@@ -377,16 +376,11 @@ namespace
             std::array<unsigned, n_words_ * bits_per_word> p_order;
             std::array<unsigned, n_words_ * bits_per_word> p_bounds;
             colour_class_order(p, p_order, p_bounds);
-            int length;
-            int f = 0;
 
 
 
             // for each v in p... (v comes later)
             for (int n = p.popcount() - 1 ; n >= 0 ; --n) {
-                if(c.size()==0){
-                    used.set_all_zero();
-                }
                 auto v = p_order[n];
 
                 // consider taking v
@@ -397,40 +391,18 @@ namespace
                 // filter p to contain vertices adjacent to v
                 BitSet<n_words_> new_p = p;
                 graph.intersect_with_row(v, new_p);
-
-                length = used.popcount();
-                used.set(v);
-
-                if (new_p.empty()) {
-                    if(length != used.popcount()&&c.size()!=1){
-                        int l = sols.size();
-                        if(l!=0){
-                            f = 0;
-                            
-                            for (size_t i = 0; i < l; i++)
-                            {
-                                if(sols[i].equals(c)){
-                                    f = 1;
-                                }
-
-                            }
-                            if(f == 0){
-                                result.count++;
-                                sols.push_back(used);
-                            }
-                            
-                        }else{
-                            result.count++;
-                            sols.push_back(used);
-                        }
-                    }
-                }
-                else
-                    expand(c, new_p, used,sols);
+				BitSet<n_words_> new_u = used;
+				graph.intersect_with_row(v,new_u);
+				if(new_p.empty()&&new_u.empty()){
+					result.count++;
+				}else{
+					expand(c,new_p,new_u);
+				}
 
                 // now consider not taking v
                 c.pop_back();
                 p.unset(v);
+				used.set(v);
             }
         }
 
