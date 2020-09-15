@@ -356,12 +356,12 @@ namespace
         auto copy_and_expand(
                 std::vector<unsigned> & c,
                 BitSet<n_words_> & p,
-				BitSet<n_words_> & used
+		BitSet<n_words_> & used
                 )
         {
             auto c_copy = c;
             auto p_copy = p;
-			auto used_copy = used;
+	    auto used_copy = used;
             expand(c_copy, p_copy, used_copy);
         }
 
@@ -386,7 +386,7 @@ namespace
         auto expand(
                 std::vector<unsigned> & c,
                 BitSet<n_words_> & p,
-				BitSet<n_words_> & used
+		BitSet<n_words_> & used
                 ) -> void
         {
             // ++n_colourings;
@@ -590,14 +590,14 @@ auto main(int argc, char * argv[]) -> int
         auto overall_time = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - start_time);
 
-        std::cout << "size = " << result.size << std::endl;
+        std::cout << "count = " << result.count << std::endl;
 
-        std::cout << "solution =";
-        for (auto v : result.members)
-            std::cout << " " << v + 1;
-        std::cout << std::endl;
+        //std::cout << "solution =";
+        //for (auto v : result.members)
+            //std::cout << " " << v + 1;
+        //std::cout << std::endl;
 
-        std::cout << "colourings = " << result.n_colourings << std::endl;
+        //std::cout << "colourings = " << result.n_colourings << std::endl;
 
         std::cout << "cpu = " << overall_time.count() << std::endl;
 
