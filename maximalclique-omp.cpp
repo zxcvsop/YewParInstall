@@ -162,8 +162,8 @@ namespace
                 for (int i = 0 ; i < _size ; ++i)
                     set(i);
             }
-	    
-	    auto set_all_zero() -> void{
+			
+			auto set_all_zero() -> void{
                 for(int i = 0; i < _size; ++i)
                     _bits[i / bits_per_word] = 0;
             }
@@ -299,7 +299,7 @@ namespace
         std::vector<int> order;
         MaxCliqueResult result;
 
-        std::atomic<unsigned> size;
+        std::atomic<unsigned> count;
         std::atomic<unsigned long long> n_colourings;
         std::mutex result_members_mutex;
 
@@ -356,12 +356,12 @@ namespace
         auto copy_and_expand(
                 std::vector<unsigned> & c,
                 BitSet<n_words_> & p,
-		BitSet<n_words_> & used
+				BitSet<n_words_> & used
                 )
         {
             auto c_copy = c;
             auto p_copy = p;
-	    auto used_copy = used;
+			auto used_copy = used;
             expand(c_copy, p_copy, used_copy);
         }
 
@@ -369,24 +369,27 @@ namespace
                 const std::vector<unsigned> & c)
         {
             while (true) {
-                unsigned current_size = size.load();
-                if (c.size() <= current_size)
-                    break;
+                // unsigned current_size = size.load();
+                // if (c.size() <= current_size)
+                    // break;
 
-                if (size.compare_exchange_weak(current_size, c.size())) {
-                    std::unique_lock<std::mutex> lock(result_members_mutex);
-                    result.members.clear();
-                    for (auto & v : c)
-                        result.members.insert(order[v]);
-                    break;
-                }
+                // if (size.compare_exchange_weak(current_size, c.size())) {
+                    // std::unique_lock<std::mutex> lock(result_members_mutex);
+                    // result.members.clear();
+                    // for (auto & v : c)
+                        // result.members.insert(order[v]);
+                    // break;
+                // }
+				unsigned current_count = count.load();
+				count++;
+				break;
             }
         }
 
         auto expand(
                 std::vector<unsigned> & c,
                 BitSet<n_words_> & p,
-		BitSet<n_words_> & used
+				BitSet<n_words_> & used
                 ) -> void
         {
             // ++n_colourings;
@@ -423,7 +426,7 @@ namespace
                 // // now consider not taking v
                 // c.pop_back();
                 // p.unset(v);
-		auto v = p_order[n];
+				auto v = p_order[n];
 
                 // consider taking v
                 c.push_back(v);
@@ -433,39 +436,39 @@ namespace
                 // filter p to contain vertices adjacent to v
                 BitSet<n_words_> new_p = p;
                 graph.intersect_with_row(v, new_p);
-		BitSet<n_words_> new_u = used;
-		graph.intersect_with_row(v,new_u);
-		if(new_p.empty()&&new_u.empty()){
-			count++;
-		}else if(c.size()==1){
-			copy_and_expand(c,new_p,new_u);
-		}else{
-			expand(c,new_p,new_u);
-		}
+				BitSet<n_words_> new_u = used;
+				graph.intersect_with_row(v,new_u);
+				if(new_p.empty()&&new_u.empty()){
+					// result.count++;
+					potential_new_best(c);
+				}else if(c.size()==1){
+					copy_and_expand(c,new_p,new_u);
+				}else{
+					expand(c,new_p,new_u);
+				}
 
                 // now consider not taking v
                 c.pop_back();
                 p.unset(v);
-		used.set(v);
+				used.set(v);
             }
         }
 
         auto run() -> MaxCliqueResult
         {
             count = 0;
-            //n_colourings = 0;
-
+            // n_colourings = 0;
+			// num = 0;
             std::vector<unsigned> c;
             c.reserve(graph.size());
 
             BitSet<n_words_> p;
             p.resize(graph.size());
             p.set_all();
-		
-	    BitSet<n_words_> u;
+			
+			BitSet<n_words_> u;
             u.resize(graph.size());
-	    u.set_all_zero();	
-
+			u.set_all_zero();
             // go!
             #pragma omp parallel
             #pragma omp single
@@ -474,7 +477,7 @@ namespace
             }
 
             result.count = count;
-            //result.n_colourings = n_colourings;
+            // result.n_colourings = n_colourings;
 
             return result;
         }
@@ -592,12 +595,12 @@ auto main(int argc, char * argv[]) -> int
 
         std::cout << "count = " << result.count << std::endl;
 
-        //std::cout << "solution =";
-        //for (auto v : result.members)
-            //std::cout << " " << v + 1;
-        //std::cout << std::endl;
+        // std::cout << "solution =";
+        // for (auto v : result.members)
+            // std::cout << " " << v + 1;
+        // std::cout << std::endl;
 
-        //std::cout << "colourings = " << result.n_colourings << std::endl;
+        // std::cout << "colourings = " << result.n_colourings << std::endl;
 
         std::cout << "cpu = " << overall_time.count() << std::endl;
 
