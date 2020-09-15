@@ -162,6 +162,11 @@ namespace
                 for (int i = 0 ; i < _size ; ++i)
                     set(i);
             }
+	    
+	    auto set_all_zero() -> void{
+                for(int i = 0; i < _size; ++i)
+                    _bits[i / bits_per_word] = 0;
+            }
 
             auto test(int a) const -> bool
             {
@@ -418,7 +423,7 @@ namespace
                 // // now consider not taking v
                 // c.pop_back();
                 // p.unset(v);
-				auto v = p_order[n];
+		auto v = p_order[n];
 
                 // consider taking v
                 c.push_back(v);
@@ -428,27 +433,27 @@ namespace
                 // filter p to contain vertices adjacent to v
                 BitSet<n_words_> new_p = p;
                 graph.intersect_with_row(v, new_p);
-				BitSet<n_words_> new_u = used;
-				graph.intersect_with_row(v,new_u);
-				if(new_p.empty()&&new_u.empty()){
-					result.count++;
-				}else if(c.size()==1){
-					copy_and_expand(c,new_p,new_u);
-				}else{
-					expand(c,new_p,new_u);
-				}
+		BitSet<n_words_> new_u = used;
+		graph.intersect_with_row(v,new_u);
+		if(new_p.empty()&&new_u.empty()){
+			count++;
+		}else if(c.size()==1){
+			copy_and_expand(c,new_p,new_u);
+		}else{
+			expand(c,new_p,new_u);
+		}
 
                 // now consider not taking v
                 c.pop_back();
                 p.unset(v);
-				used.set(v);
+		used.set(v);
             }
         }
 
         auto run() -> MaxCliqueResult
         {
-            size = 0;
-            n_colourings = 0;
+            count = 0;
+            //n_colourings = 0;
 
             std::vector<unsigned> c;
             c.reserve(graph.size());
@@ -456,16 +461,20 @@ namespace
             BitSet<n_words_> p;
             p.resize(graph.size());
             p.set_all();
+		
+	    BitSet<n_words_> u;
+            u.resize(graph.size());
+	    u.set_all_zero();	
 
             // go!
             #pragma omp parallel
             #pragma omp single
             {
-            expand(c, p);
+            expand(c, p, u);
             }
 
-            result.size = size;
-            result.n_colourings = n_colourings;
+            result.count = count;
+            //result.n_colourings = n_colourings;
 
             return result;
         }
